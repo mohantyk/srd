@@ -29,3 +29,12 @@ def awgn(duration=0.05, Ts=1/10000):
         sampling duration
     '''
     return np.random.randn(int(duration/Ts))
+
+
+def mysinc(freq, duration=0.05, Ts=1/10000):
+    '''
+    Returns a sinc wave with a single-sided bandwidth equal to freq
+    '''
+    t = np.arange(0, duration, Ts)
+    w = np.sinc(2*freq*(t-duration/2))
+    return t, w
