@@ -10,6 +10,8 @@ import math
 import numpy as np
 from scipy.fftpack import fft, fftshift
 
+import matplotlib.pyplot as plt
+
 def plotspec(sig, Ts):
     '''
     Returns the spectrum centered at 0
@@ -21,4 +23,10 @@ def plotspec(sig, Ts):
     ssf = np.arange(math.ceil(-N/2), math.ceil(N/2))/(Ts*N) # Frequency vector
     fx = fft(sig) # FFT
     fxs = np.abs(fftshift(fx)) # Shift it for plotting, take amplitude
-    return ssf, fxs
+    
+    plt.figure()
+    plt.plot(ssf, fxs)
+    plt.xlabel('frequency')
+    plt.ylabel('magnitude')
+    plt.show()
+    
