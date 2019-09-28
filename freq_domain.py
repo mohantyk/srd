@@ -12,6 +12,8 @@ from scipy.fftpack import fft, fftshift
 
 import matplotlib.pyplot as plt
 
+import global_params as G
+
 def plotspec(sig, Ts):
     '''
     Returns the spectrum centered at 0
@@ -20,13 +22,14 @@ def plotspec(sig, Ts):
         Ts: sampling interval (in sec)
     '''
     N = len(sig)
-    ssf = np.arange(math.ceil(-N/2), math.ceil(N/2))/(Ts*N) # Frequency vector
+    freq_range = np.arange(math.ceil(-N/2), math.ceil(N/2))/(Ts*N) # Frequency vector
     fx = fft(sig) # FFT
-    fxs = np.abs(fftshift(fx)) # Shift it for plotting, take amplitude
+    freqs = np.abs(fftshift(fx)) # Shift it for plotting, take amplitude
     
-    plt.figure()
-    plt.plot(ssf, fxs)
+    plt.figure( figsize=G.FIGSIZE )
+    plt.plot(freq_range, freqs)
     plt.xlabel('frequency')
     plt.ylabel('magnitude')
     plt.show()
+
     
