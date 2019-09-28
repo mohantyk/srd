@@ -21,6 +21,20 @@ def sine_wave(freq, duration=0.05, Ts=1/10000):
     return t, w
 
 
+def cosine_wave(freq, duration=0.05, Ts=1/10000):
+    '''
+    inputs: 
+        freq (Hz)
+        duration (sec)
+        sampling duration (sec)
+    outputs:
+        timestep, sine waveform
+    '''
+    t = np.arange(0, duration, Ts)
+    w = np.cos(2*np.pi*freq*t)
+    return t, w
+
+
 def awgn(duration=0.05, Ts=1/10000):
     '''
     Returns an awgn waveform
