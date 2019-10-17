@@ -9,7 +9,7 @@ Created on Wed Oct 16 18:01:37 2019
 import numpy as np
 
 class Quantizer:
-    allowed_modes = ('ufixed')
+    allowed_modes = ('ufixed', 'fixed')
     allowed_overflow = ('saturate')
     allowed_rounding = {'floor': np.floor, 
                         'ceil': np.ceil, 
@@ -61,6 +61,9 @@ class Quantizer:
         if self.mode == 'ufixed':
             max_val = 2**(self.int_bits) - step_size
             min_val = 0
+        elif self.mode == 'fixed':
+            max_val = 2**(self.int_bits -1) - step_size
+            min_val = -2**(self.int_bits - 1)
 
         overflow = False
         output = inp
@@ -77,6 +80,6 @@ class Quantizer:
 
 
 if __name__ == '__main__':
-        quantizer = Quantizer(12, 8)
-        quant_pi, overflow = quantizer.quantize(np.pi)
+        quantizer = Quantizer(12, 8, 'fixed')
+        quant_pi, overflow = quantizer.quantize(-np.pi)
         print( quant_pi, overflow ) 
