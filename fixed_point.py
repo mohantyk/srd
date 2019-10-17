@@ -51,10 +51,32 @@ class Quantizer:
         quantized_frac_abs = np.abs(quantized_frac)
         output = sign*(inp_int+ quantized_frac_abs)
 
-        return output
+        output, overflow  = self.check_for_overflow(output)
+
+        return output, overflow
+
+
+    def check_for_overflow(self, inp):
+        step_size = 1/(2**self.frac_bits)
+        if self.mode == 'ufixed':
+            max_val = 2**(self.int_bits) - step_size
+            min_val = 0
+
+        overflow = False
+        output = inp
+        if self.overflow_mode == 'saturate':
+            if inp > max_val:
+                overflow = True
+                output = max_val 
+            elif inp < min_val:
+                overflow = True 
+                output = min_val
+
+        return output, overflow
 
 
 
 if __name__ == '__main__':
         quantizer = Quantizer(12, 8)
-        print( quantizer.quantize(np.pi) )
+        quant_pi, overflow = quantizer.quantize(np.pi)
+        print( quant_pi, overflow ) 
