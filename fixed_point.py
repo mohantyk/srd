@@ -6,10 +6,16 @@ Created on Wed Oct 16 18:01:37 2019
 @author: kaniska
 """
 
+import numpy as np
+
 class Quantizer:
     allowed_modes = ('ufixed')
-    allowed_rounding = ('floor', 'ceil', 'nearest')
     allowed_overflow = ('saturate')
+    allowed_rounding = {'floor': np.floor, 
+                        'ceil': np.ceil, 
+                        'nearest': np.round}
+
+
     
     @classmethod
     def check_arg(cls, arg, allowed_values):
@@ -17,16 +23,38 @@ class Quantizer:
             raise ValueError(f'{arg} not supported. Only the following values are allowed {allowed_values}')
     
 
-    def __init__(self, int_bits, frac_bits, mode='ufixed', round_mode='floor', overflow_mode='saturate'):
+    def __init__(self, total_bits, frac_bits, 
+                mode='ufixed', round_mode='nearest', overflow_mode='saturate'):
         self.check_arg(mode, self.allowed_modes)
         self.check_arg(round_mode, self.allowed_rounding)
         self.check_arg(overflow_mode, self.allowed_overflow)
-        self.int_bits = int_bits
+
+        self.mode = mode
+        self.round_mode = round_mode
+        self.overflow_mode = overflow_mode
+        
+        self.total_bits = total_bits
         self.frac_bits = frac_bits
+        self.int_bits = total_bits - frac_bits
 
     def quantize(self, inp):
-        pass
+        frac_multiplier = 2**(self.frac_bits)
+        sign = np.sign(inp)
+
+        inp_abs = np.abs(inp)
+        inp_int = np.floor(inp_abs)
+        inp_frac = sign*(inp_abs - inp_int)
+        
+        quant_func = self.allowed_rounding[self.round_mode]
+        quantized_frac = quant_func( frac_multiplier * inp_frac ) / frac_multiplier
+
+        quantized_frac_abs = np.abs(quantized_frac)
+        output = sign*(inp_int+ quantized_frac_abs)
+
+        return output
+
 
 
 if __name__ == '__main__':
         quantizer = Quantizer(12, 8)
+        print( quantizer.quantize(np.pi) )
