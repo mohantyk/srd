@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 
 import global_params as G
 
-def plotspec(sig, Ts):
+def plotspec(sig, Ts, ax=None):
     '''
     Returns the spectrum centered at 0
     inputs:
@@ -26,7 +26,8 @@ def plotspec(sig, Ts):
     fx = fft(sig) # FFT
     freqs = np.abs(fftshift(fx)) # Shift it for plotting, take amplitude
     
-    _, ax = plt.subplots( figsize=G.FIGSIZE )
+    if ax is None:
+        _, ax = plt.subplots( figsize=G.FIGSIZE )
     ax.plot(freq_range, freqs)
     ax.set_xlabel('frequency')
     ax.set_ylabel('magnitude')
