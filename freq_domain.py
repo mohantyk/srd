@@ -24,12 +24,19 @@ def plot_signal(t, sig, ax_sig):
     return ax_sig
 
 
-def plot_amplitude(freq_range, freqs, ax_spec):
+def plot_amplitude(freq_range, amplitude, ax_spec):
     # Plot spectrum amplitude
-    ax_spec.plot(freq_range, freqs)
+    ax_spec.plot(freq_range, amplitude)
     ax_spec.set_xlabel('Frequency')
     ax_spec.set_ylabel('Magnitude')
     return ax_spec
+
+
+def plot_phase(freq_range, phase, ax_spec):
+    # Plot spectrum phase
+    ax_spec.plot(freq_range, phase)
+    ax_spec.set_xlabel('Frequency')
+    ax_spec.set_ylabel('Phase')
 
 
 def plotspec(sig, Ts, ax_spec=None):
@@ -45,7 +52,10 @@ def plotspec(sig, Ts, ax_spec=None):
 
     freq_range = np.arange(math.ceil(-N/2), math.ceil(N/2))/(Ts*N) # Frequency vector
     fx = fft(sig) # FFT
-    freqs = np.abs(fftshift(fx)) # Shift it for plotting, take amplitude
+
+    freqs = fftshift(fx) # Shift it for plotting
+    amplitude = np.abs(freqs)
+    phase = np.unwrap( np.angle(freqs) )
 
     if ax_spec is None:
         _, (ax_sig, ax_spec) = plt.subplots(1,2, figsize=G.FIGSIZE )
@@ -53,6 +63,6 @@ def plotspec(sig, Ts, ax_spec=None):
         ax_sig = None # If spectrum axis is given, no need to plot signal
 
     plot_signal(t, sig, ax_sig)
-    ax_spec = plot_amplitude(freq_range, freqs, ax_spec)
+    ax_spec = plot_amplitude(freq_range, amplitude, ax_spec)
     return ax_spec
 
