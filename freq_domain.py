@@ -14,6 +14,24 @@ import matplotlib.pyplot as plt
 
 import global_params as G
 
+
+def plot_signal(t, sig, ax_sig):
+    # Plot signal
+    if ax_sig is not None: 
+        ax_sig.plot(t, sig)
+        ax_sig.set_xlabel('Seconds')
+        ax_sig.set_ylabel('Amplitude')
+    return ax_sig
+
+
+def plot_amplitude(freq_range, freqs, ax_spec):
+    # Plot spectrum amplitude
+    ax_spec.plot(freq_range, freqs)
+    ax_spec.set_xlabel('Frequency')
+    ax_spec.set_ylabel('Magnitude')
+    return ax_spec
+
+
 def plotspec(sig, Ts, ax_spec=None):
     '''
     Returns the spectrum centered at 0
@@ -34,14 +52,7 @@ def plotspec(sig, Ts, ax_spec=None):
     else:
         ax_sig = None # If spectrum axis is given, no need to plot signal
 
-    # Plot signal
-    if ax_sig is not None: 
-        ax_sig.plot(t, sig)
-        ax_sig.set_xlabel('Seconds')
-        ax_sig.set_ylabel('Amplitude')
-
-    # Plot spectrum    
-    ax_spec.plot(freq_range, freqs)
-    ax_spec.set_xlabel('Frequency')
-    ax_spec.set_ylabel('Magnitude')
+    plot_signal(t, sig, ax_sig)
+    ax_spec = plot_amplitude(freq_range, freqs, ax_spec)
     return ax_spec
+
