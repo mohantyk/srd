@@ -26,10 +26,8 @@ def plotspec(sig, Ts):
     fx = fft(sig) # FFT
     freqs = np.abs(fftshift(fx)) # Shift it for plotting, take amplitude
     
-    plt.figure( figsize=G.FIGSIZE )
-    plt.plot(freq_range, freqs)
-    plt.xlabel('frequency')
-    plt.ylabel('magnitude')
-    plt.show()
-
-    
+    _, ax = plt.subplots( figsize=G.FIGSIZE )
+    ax.plot(freq_range, freqs)
+    ax.set_xlabel('frequency')
+    ax.set_ylabel('magnitude')
+    return ax
