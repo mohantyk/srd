@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 Spyder Editor
-
-This is a temporary script file.
 """
 
 import numpy as np
+from scipy import signal
 
 def sine_wave(freq, duration=0.05, Ts=1/10000):
     '''
@@ -70,3 +69,22 @@ def gaussian_pulse(start, stop, Ts=1/10000):
     t = np.arange(start, stop, Ts)
     pulse = np.exp(-(t**2))
     return t, pulse
+
+
+def bandlimited(F_start, F_stop, duration, Ts=1/10000):
+    '''
+    Creates a bandlimited signal
+    '''
+    Fs = 1/Ts
+    f_start = F_start/(Fs/2)
+    f_stop = F_stop/(Fs/2)
+    assert(f_stop > 0.4)
+    # Design bandpass filter
+    freqs = [0, f_start - 0.1, f_start, f_stop, f_stop + 0.1, 1]
+    amps = [0, 0, 1, 1, 0, 0]
+    b = signal.firls(99, freqs, amps)
+    # Filter white noise through bandpass filter
+    noise = awgn(duration, Ts)
+    filtered_noise = signal.lfilter(b, 1, noise)
+    return filtered_noise
+
