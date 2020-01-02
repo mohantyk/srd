@@ -6,4 +6,4 @@ Created on Sat Sep 28 07:41:35 2019
 @author: kaniska
 """
 
-FIGSIZE = (8, 4)
+FIGSIZE = (7, 4)

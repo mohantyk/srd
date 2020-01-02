@@ -47,8 +47,9 @@ def plotspec(sig, Ts):
     spectrum = fftshift(fx) # Shift it for plotting
     amplitude = np.abs(spectrum)
 
-    _, ax = plt.subplots(1,2, figsize=G.FIGSIZE )
+    fig, ax = plt.subplots(1,2, figsize=G.FIGSIZE )
     
     plot_signal(t, sig, ax[0])
     plot_amplitude(freq_range, amplitude, ax[1])
+    fig.subplots_adjust(wspace=0.3)
     return ax
