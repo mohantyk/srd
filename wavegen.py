@@ -78,9 +78,8 @@ def bandlimited(F_start, F_stop, duration, Ts=1/10000):
     Fs = 1/Ts
     f_start = F_start/(Fs/2)
     f_stop = F_stop/(Fs/2)
-    assert(f_stop > 0.4)
     # Design bandpass filter
-    freqs = [0, f_start - 0.1, f_start, f_stop, f_stop + 0.1, 1]
+    freqs = [0, f_start - 0.01, f_start, f_stop, f_stop + 0.01, 1]
     amps = [0, 0, 1, 1, 0, 0]
     b = signal.firls(99, freqs, amps)
     # Filter white noise through bandpass filter
