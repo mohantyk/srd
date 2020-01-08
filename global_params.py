@@ -7,3 +7,4 @@ Created on Sat Sep 28 07:41:35 2019
 """
 
 FIGSIZE = (7, 4)
+SMALL_FIG = (4,3)
