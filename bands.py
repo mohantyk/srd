@@ -23,10 +23,18 @@ class Bands:
         '''
         self.all_bands = []
         for band in bands:
-            self.all_bands.append(Band(band[0], band[1]))
+            self.all_bands.append(Band(*band))
         self.Fs = 1/Ts
             
-            
+    def add_band(self, *bands):
+        '''
+        Adds new bands
+        '''
+        for band in bands:
+            self.all_bands.append( Band(*band) )
+        return self
+    
+    
     def plot(self):
         '''
         Plot the bands in frequency
