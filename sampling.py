@@ -8,14 +8,21 @@ Created on Mon Feb 25 16:54:44 2019
 
 import numpy as np
 
-def downsample_waveform(sig, n):
+def sample_waveform(sig, fs, Ts):
     '''
     inputs:
         sig: signal
-        n: sample every nth sample e.g, n=2 skips one sample
+        fs: Sampling frequency
+        Ts: Simulation timestep
     output:
         sampled waveform
     '''
+    Fs = 1/Ts # Simulation sampling rate, not actual sampling rate
+    sample_ratio = Fs/fs
+    n = round(sample_ratio) # Number of samples to be skipped
+    if n != sample_ratio:
+        raise ValueError('1/Ts should be a multiple of fs')
+        
     w = np.zeros_like(sig)
     w[::n] = sig[::n]
     return w
