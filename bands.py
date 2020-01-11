@@ -7,6 +7,7 @@ Created on Sat Jan 11 06:52:48 2020
 """
 from collections import namedtuple
 
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -83,3 +84,8 @@ class Bands:
                 images.append( Band(band.start + k*fs, band.stop + k*fs) )
         self.all_bands = images
         return self
+    
+    def __repr__(self):
+        return f'{[tuple(band) for band in self.all_bands]}'
+    
+    
