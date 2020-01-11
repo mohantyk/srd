@@ -5,25 +5,73 @@ Created on Sat Jan 11 06:52:48 2020
 
 @author: kaniska
 """
-from dataclasses import dataclass
+from collections import namedtuple
 
 import numpy as np
+import matplotlib.pyplot as plt
 
-@dataclass
-class Band:
-    start: float
-    stop: float
+        
+Band = namedtuple('Band', ['start', 'stop'])
+
     
-    def as_freqs(self, Ts=1e-4):
-        Fs = 1/Ts
+class Bands:
+    def __init__(self, *bands, Ts=1e-4):
+        '''
+        input:
+            bands : all the bands as (start, stop) tuples
+            Ts : simulation sampling rate
+        '''
+        self.all_bands = []
+        for band in bands:
+            self.all_bands.append(Band(band[0], band[1]))
+        self.Fs = 1/Ts
+            
+            
+    def plot(self):
+        '''
+        Plot the bands in frequency
+        '''
+        Fs = self.Fs
         freqs = np.arange(-Fs/2, Fs/2)
         amps = np.zeros_like(freqs)
-        amps[(freqs>=self.start) & (freqs<=self.stop)] = 1
-        return freqs, amps
+        for band in self.all_bands:
+            amps[(freqs>=band.start) & (freqs<=band.stop)] += 1
+        plt.figure()
+        plt.plot(freqs, amps)
+        plt.show()
+    
     
     def modulate(self, fc):
-        pos = Band(self.start+fc, self.stop+fc)
-        neg = Band(self.start-fc, self.stop-fc)
-        return (pos, neg)
-        
+        '''
+        Modulate with a real cosine wave
+        input:
+            fc: frequency of cosine wave
+        '''
+        new_bands = []
+        for band in self.all_bands:
+            new_bands.append( Band(band.start-fc, band.stop-fc))
+            new_bands.append( Band(band.start+fc, band.stop+fc))
+        self.all_bands = new_bands
+        return self
     
+    @property
+    def min_freq(self):
+        return min( band.start for band in self.all_bands )
+    
+    @property
+    def max_freq(self):
+        return max( band.stop for band in self.all_bands )
+    
+    def sample(self, fs):
+        '''
+        Sample at rate fs (different from simulation rate Fs)
+        '''   
+        Fs = self.Fs
+        images = []
+        for band in self.all_bands:
+            k_min = np.floor((band.stop + Fs/2)/fs).astype(int)
+            k_max = np.floor((Fs/2 - band.start)/fs).astype(int)
+            for k in range(-k_min, k_max + 1):
+                images.append( Band(band.start + k*fs, band.stop + k*fs) )
+        self.all_bands = images
+        return self
