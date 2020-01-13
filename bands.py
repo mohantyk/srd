@@ -86,6 +86,6 @@ class Bands:
         return self
     
     def __repr__(self):
-        return f'{[tuple(band) for band in self.all_bands]}'
+        return f'{[tuple(band) for band in sorted(self.all_bands)]}'
     
     
