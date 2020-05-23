@@ -10,3 +10,6 @@ class TestEncoding:
     def test_letters2pam(self):
         msg = 'A'
         assert letters2pam(msg) == [-1, -3, -3, -1]
+
+        msg = 'AI'
+        assert letters2pam(msg) == [-1, -3, -3, -1, -1, -3, 1, -1]
