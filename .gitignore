@@ -5,3 +5,4 @@ SRD_solutions.lyx~
 .DS_Store
 book_files
 *.code-workspace
+.vscode/*
