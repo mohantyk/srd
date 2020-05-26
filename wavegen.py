@@ -9,7 +9,7 @@ import warnings
 
 def sine_wave(freq, duration=0.05, Ts=1/10000):
     '''
-    inputs: 
+    inputs:
         freq (Hz)
         duration (sec)
         sampling duration (sec)
@@ -23,7 +23,7 @@ def sine_wave(freq, duration=0.05, Ts=1/10000):
 
 def cosine_wave(freq, duration=0.05, Ts=1/10000):
     '''
-    inputs: 
+    inputs:
         freq (Hz)
         duration (sec)
         sampling duration (sec)
@@ -96,9 +96,11 @@ def bandlimited(F_start, F_stop, duration, Ts=1/10000):
 
 def rcosine(syms, osr, β):
     '''
-    syms: half the duration
-    osr: oversampling rate
-    β: roll off factor, 0 gives sinc
+    Raised cosine waveform
+    inputs:
+        syms: half the duration
+        osr: oversampling rate
+        β: roll off factor, 0 gives sinc
     '''
     # All calculations are normalized by T
     duration = (-syms, syms)
@@ -107,7 +109,7 @@ def rcosine(syms, osr, β):
     with warnings.catch_warnings():
         warnings.simplefilter('ignore') # For Divide by zero
         rcos_filt = np.sinc(t) * np.cos(np.pi*β*t) / (1-(2*β*t)**2)
-    
+
     if β != 0:
         rcos_filt[np.isinf(rcos_filt)] = (np.pi/4)*np.sinc(1/(2*β))
 
