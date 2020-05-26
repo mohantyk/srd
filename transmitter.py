@@ -54,7 +54,7 @@ def ideal_transmitter(msg):
     oversampling_factor = 100
     analog_waveform = pulse_shaped(symbols, oversampling_factor)
     # Modulate with carrier wave
-    Ts = 1/oversampling_factor
+    Ts = 1/oversampling_factor # Assumed symbol duration = 1
     carrier_freq = 20
     duration = len(symbols)
     t, carrier = cosine_wave(carrier_freq, duration, Ts)
