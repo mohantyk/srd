@@ -1,6 +1,8 @@
 import numpy as np
 from scipy import signal
 
+from wavegen import cosine_wave
+
 # Helper functions
 def pairwise(iterator):
     ''' Pairs up two elements at a time '''
@@ -35,3 +37,29 @@ def pulse_shaped(symbols, oversample=10):
     analog_signal = np.convolve(oversampled_symbols, pulse)
     analog_signal = analog_signal[:len(oversampled_symbols)] # Remove the trailing transit
     return analog_signal
+
+
+#-----------------
+# Ideal transmitter
+def ideal_transmitter(msg):
+    '''
+    inputs:
+        msg: message string
+    outputs:
+        time array
+        transmitted signal
+    '''
+    # Convert to PAM symbols
+    symbols = letters2pam(msg)
+    # Pulse shaping
+    oversampling_factor = 100
+    analog_waveform = pulse_shaped(symbols, oversampling_factor)
+    # Modulate with carrier wave
+    Ts = 1/oversampling_factor
+    carrier_freq = 20
+    duration = len(symbols)
+    t, carrier = cosine_wave(carrier_freq, duration, Ts)
+    transmitted = carrier * analog_waveform
+    return t, transmitted
+
+
