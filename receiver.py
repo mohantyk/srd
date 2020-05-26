@@ -4,6 +4,35 @@ from scipy import signal
 from wavegen import cosine_wave
 from utilities import power
 
+#-------------------------
+# Helper functions
+def combine(iterator, num_elems):
+    ''' Pairs up a fixed number of  elements at a time '''
+    window = [iter(iterator)]*num_elems
+    for combo in zip(*window):
+        yield combo
+
+#-------------------------
+# Decoder
+
+def pam2letters(symbols):
+    '''
+    inputs:
+        symbols: list of pam symbols
+    outputs:
+        msg as a str
+    '''
+    symbol_to_bits = {3: '11', 1: '10', -1: '01', -3: '00'}
+    bits = ''.join(symbol_to_bits[symbol] for symbol in symbols)
+    msg = []
+    for eight_bits in combine(bits, 8):
+        ascii = int(''.join(eight_bits), 2)
+        ch = chr(ascii)
+        msg.append(ch)
+    return ''.join(msg)
+
+
+
 def ideal_receiver(sig, fc, Ts):
     '''
     inputs:
