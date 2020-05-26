@@ -2,6 +2,7 @@ import numpy as np
 from scipy import signal
 
 from wavegen import cosine_wave
+from sampling import oversample
 
 # Helper functions
 def pairwise(iterator):
@@ -24,16 +25,14 @@ def letters2pam(msg):
     symbols = [symbol_map[''.join(pair)] for pair in pairwise(msg_bin)]
     return symbols
 
-def pulse_shaped(symbols, oversample=10):
+def pulse_shaped(symbols, oversample_factor=10):
     '''
     inputs:
         symbols: list of symbols
-        oversample: oversampling factor (to simulate analog signal)
+        oversample_factor: oversampling factor (to simulate analog signal)
     '''
-    pulse = signal.hamming(oversample)
-    num_symbols = len(symbols)
-    oversampled_symbols = np.zeros(oversample * num_symbols)
-    oversampled_symbols[::oversample] = symbols
+    pulse = signal.hamming(oversample_factor)
+    oversampled_symbols = oversample(symbols, oversample_factor)
     analog_signal = np.convolve(oversampled_symbols, pulse)
     analog_signal = analog_signal[:len(oversampled_symbols)] # Remove the trailing transit
     return analog_signal
