@@ -55,6 +55,21 @@ def demodulate(sig, fc, Ts):
     return baseband
 
 
+def pulse_correlator(sig, M):
+    '''
+    inputs:
+        sig: baseband signal
+        M : oversampling factor
+    '''
+    pulse = signal.hamming(M)
+    # Normalize pulse so that correlation with another pulse gives coeff = 1
+    pulse_normalized = pulse/(power(pulse)*len(pulse))
+    # In 'full' mode, correlation of a pulse with itself gives an array of 2*M-1 elements
+    # The peak is at index M - 1
+    correlated = np.correlate(sig, pulse_normalized, 'full')
+    return correlated
+
+
 # Final receiver
 def ideal_receiver(sig):
     '''
@@ -66,13 +81,10 @@ def ideal_receiver(sig):
     oversample_factor = 100
     # Demodulate the carrier wave
     baseband = demodulate(sig, fc, Ts)
-
     # Use correlation to extract pulse amplitudes
-    pulse = signal.hamming(oversample_factor)
-    pulse_normalized = pulse/(power(pulse)*len(pulse))
-    correlator = np.correlate(baseband, pulse_normalized, 'full')
+    correlated = pulse_correlator(baseband, oversample_factor)
 
-    return correlator
+    return correlated
 
 
 
