@@ -70,6 +70,16 @@ def pulse_correlator(sig, M):
     return correlated
 
 
+def quantalph(sig, alphabet):
+    '''
+    Quantize sig to nearest symbol in alphabet
+    '''
+    dist = (sig.reshape(-1,1) - alphabet.reshape(1, -1))**2
+    idx = np.argmin(dist, axis=1)
+    hard_decisions = alphabet[idx]
+    return hard_decisions
+
+
 # Final receiver
 def ideal_receiver(sig):
     '''
