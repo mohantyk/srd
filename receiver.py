@@ -13,7 +13,7 @@ def combine(iterator, num_elems):
         yield combo
 
 #-------------------------
-# Decoder
+# Receiver blocks
 
 def pam2letters(symbols):
     '''
@@ -32,17 +32,30 @@ def pam2letters(symbols):
     return ''.join(msg)
 
 
-
-def ideal_receiver(sig, fc, Ts):
+def demodulate(sig, fc, Ts):
     '''
+    Demodulate a carrier wave
     inputs:
-        sig: received signal (numpy array)
-        fc:  carrier frequency
-        Ts:  sampling duration (for simulated analog sig)
+        sig: analog signal
+        fc : carrier wave frequency
+        Ts : sampling duration of analog signal
     '''
     duration = len(sig)*Ts
     t, carrier = cosine_wave(fc, duration, Ts)
     demodulated = sig * carrier
+    return t, demodulated
+
+
+# Final receiver
+def ideal_receiver(sig):
+    '''
+    inputs:
+        sig: received signal (numpy array)
+    '''
+    fc = 20
+    Ts = 1/100
+    # Demodulate the carrier wave
+    _, demodulated = demodulate(sig, fc, Ts)
     # low pass filter
     taps = 50
     Fs = 1/Ts
@@ -51,7 +64,7 @@ def ideal_receiver(sig, fc, Ts):
     b = signal.remez(taps, band_edges, damps, fs=Fs)
     # Scaling by 2 below to compensate for cos(x)**2 = (1/2)*[cos(2x) + 1]
     baseband = 2*signal.lfilter(b, 1, demodulated) # Baseband is still in 'analog' domain
-    # Use correlation to extract pulses
+    # Use correlation to extract pulse amplitudes
     oversample_factor = 100
     pulse = signal.hamming(oversample_factor)
     pulse_normalized = pulse/(power(pulse)*len(pulse))
