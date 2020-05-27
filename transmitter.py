@@ -55,10 +55,12 @@ def modulate(sig, fc, Ts):
 
 #-----------------
 # Ideal transmitter
-def ideal_transmitter(msg):
+def ideal_transmitter(msg, fc=20, M=100):
     '''
     inputs:
         msg: message string
+        fc:  carrier frequency
+         M:  oversampling factor (for simulating analog signal)
     outputs:
         time array
         transmitted signal
@@ -66,11 +68,9 @@ def ideal_transmitter(msg):
     # Convert to PAM symbols
     symbols = letters2pam(msg)
     # Pulse shaping
-    oversampling_factor = 100
-    analog_waveform = pulse_shaped(symbols, oversampling_factor)
+    analog_waveform = pulse_shaped(symbols, M)
     # Modulate with carrier wave
-    fc = 20
-    t, transmitted = modulate(analog_waveform, fc, 1/oversampling_factor)
+    t, transmitted = modulate(analog_waveform, fc, 1/M)
     return t, transmitted
 
 

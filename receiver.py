@@ -32,20 +32,20 @@ def pam2letters(symbols):
     return ''.join(msg)
 
 
-def demodulate(sig, fc, Ts):
+def demodulate(sig, fc, Ts, taps=50):
     '''
     Demodulate a carrier wave
     inputs:
         sig: analog signal
         fc : carrier wave frequency
         Ts : sampling duration of analog signal
+        taps: number of taps for LPF
     '''
     # Downconvert
     duration = len(sig)*Ts
     _, carrier = cosine_wave(fc, duration, Ts)
     downconverted = sig * carrier
     # Low pass filter the downconverted signal
-    taps = 50
     Fs = 1/Ts
     band_edges = np.array([0, 0.1, 0.2, 1])*(Fs//2) # Cutoff at 0.2*Fs/2
     damps = [1, 0]
@@ -81,20 +81,23 @@ def quantalph(sig, alphabet):
 
 
 # Final receiver
-def ideal_receiver(sig):
+def ideal_receiver(sig, fc=20, Ts=1/100):
     '''
     inputs:
         sig: received signal (numpy array)
+        fc: carrier frequency
+        Ts: sampling frequency (for analog signal)
+    output:
+        decoded msg (str)
     '''
-    fc = 20
-    Ts = 1/100
-    oversample_factor = 100
+    oversample_factor = int(1/Ts)
     # Demodulate the carrier wave
-    baseband = demodulate(sig, fc, Ts)
+    taps = 50
+    baseband = demodulate(sig, fc, Ts, taps)
     # Use correlation to extract pulse amplitudes
     correlated = pulse_correlator(baseband, oversample_factor)
     # Downsample to get soft decisions
-    filter_delay = 25 # taps // 2
+    filter_delay = taps//2 # taps // 2
     correlator_delay = oversample_factor
     sampling_start_idx = filter_delay + correlator_delay - 1
     soft_decisions = correlated[sampling_start_idx::oversample_factor]
