@@ -38,6 +38,21 @@ def pulse_shaped(symbols, oversample_factor=10):
     return analog_signal
 
 
+def modulate(sig, fc, Ts):
+    '''
+    Modulate an analog signal with a carrier wave
+    input:
+        sig : analog signal
+        fc: carrier frequency
+        Ts: sampling duration of analog signal
+    '''
+    duration = Ts*len(sig)
+    Fs = 1/Ts
+    assert Fs/2 > fc + 5 # Should ideally be fc + signal bw
+    t, carrier = cosine_wave(fc, duration, Ts)
+    transmitted = carrier * sig
+    return t, transmitted
+
 #-----------------
 # Ideal transmitter
 def ideal_transmitter(msg):
@@ -54,11 +69,8 @@ def ideal_transmitter(msg):
     oversampling_factor = 100
     analog_waveform = pulse_shaped(symbols, oversampling_factor)
     # Modulate with carrier wave
-    Ts = 1/oversampling_factor # Assumed symbol duration = 1
-    carrier_freq = 20
-    duration = len(symbols)
-    t, carrier = cosine_wave(carrier_freq, duration, Ts)
-    transmitted = carrier * analog_waveform
+    fc = 20
+    t, transmitted = modulate(analog_waveform, fc, 1/oversampling_factor)
     return t, transmitted
 
 
