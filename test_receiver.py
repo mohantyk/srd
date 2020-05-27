@@ -1,5 +1,6 @@
 from numpy.testing import assert_array_equal
 
+from transmitter import ideal_transmitter
 from receiver import *
 
 
@@ -16,3 +17,9 @@ class TestDecoder:
         symbols = quantalph(soft_decisions, alphabet)
         expected = np.array([-3, -3, 1])
         assert_array_equal(symbols, expected)
+
+    def test_ideal_receiver(self):
+        msg = '01234 I wish I were an Oscar Meyer wiener 56789'
+        _, transmitted = ideal_transmitter(msg)
+        decoded = ideal_receiver(transmitted)
+        assert decoded == msg

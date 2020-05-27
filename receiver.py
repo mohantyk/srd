@@ -93,8 +93,17 @@ def ideal_receiver(sig):
     baseband = demodulate(sig, fc, Ts)
     # Use correlation to extract pulse amplitudes
     correlated = pulse_correlator(baseband, oversample_factor)
-
-    return correlated
+    # Downsample to get soft decisions
+    filter_delay = 25 # taps // 2
+    correlator_delay = oversample_factor
+    sampling_start_idx = filter_delay + correlator_delay - 1
+    soft_decisions = correlated[sampling_start_idx::oversample_factor]
+    # Quantize to get hard decisions
+    alphabet = np.array([-3, -1, 1, 3])
+    hard_decisions = quantalph(soft_decisions, alphabet)
+    # Decode message
+    decoded_msg = pam2letters(hard_decisions)
+    return decoded_msg
 
 
 
