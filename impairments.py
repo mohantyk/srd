@@ -18,3 +18,9 @@ def agc(sig, desired_power, learning_rate=0.0003):
         gains[i+1] = gains[i] - learning_rate*(output[i]**2 - desired_power)
     output[-1] = gains[-1] * sig[-1]
     return output, gains
+
+
+def add_noise(sig, noise_gain=1):
+    noise = noise_gain * np.random.randn(*sig.shape)
+    noisy_sig = sig + noise
+    return noisy_sig
