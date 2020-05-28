@@ -1,4 +1,5 @@
 import numpy as np
+from scipy import signal
 
 def time_varying_fading_channel(sig):
     '''Implements a time varying fading channel'''
@@ -24,3 +25,35 @@ def add_noise(sig, noise_gain=1):
     noise = noise_gain * np.random.randn(*sig.shape)
     noisy_sig = sig + noise
     return noisy_sig
+
+
+def create_multipath(sig, severity='none', oversample_factor=100):
+    '''
+    inputs:
+        sig : input signal
+        severity: none, mild, harsh
+        oversample_factor: oversampling factor for analog signal
+    outputs:
+        output signal
+        multipath channel taps
+    '''
+    M = oversample_factor
+    if severity == 'none':
+        channel = np.array([1, 0, 0])
+    elif severity == 'mild':
+        channel = np.zeros(1+M+1+int(2.3*M)+1)
+        channel[0] = 1
+        channel[M+1] = 0.28
+        channel[-1] = 0.11
+    elif severity == 'harsh':
+        channel = np.zeros(1+M+1+int(1.8*M)+1)
+        channel[0] = 1
+        channel[M+1] = 0.28
+        channel[-1] = 0.4
+    else:
+        raise ValueError('Unknown argument type')
+
+    # Normalize channel energy, multipath copies can not exceed total input energy
+    channel /= np.linalg.norm(channel)
+    output = signal.lfilter(channel, 1, sig)
+    return output, channel
