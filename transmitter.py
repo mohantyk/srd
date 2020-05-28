@@ -38,7 +38,7 @@ def pulse_shaped(symbols, oversample_factor=10):
     return analog_signal
 
 
-def modulate(sig, fc, Ts):
+def modulate(sig, fc, Ts, phase_offset=0):
     '''
     Modulate an analog signal with a carrier wave
     input:
@@ -49,7 +49,7 @@ def modulate(sig, fc, Ts):
     duration = Ts*len(sig)
     Fs = 1/Ts
     assert Fs/2 > fc + 5 # Should ideally be fc + signal bw
-    t, carrier = cosine_wave(fc, duration, Ts)
+    t, carrier = cosine_wave(fc, duration, Ts, phase_offset)
     transmitted = carrier * sig
     return t, transmitted
 

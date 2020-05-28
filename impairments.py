@@ -39,14 +39,14 @@ def create_multipath(sig, severity='none', oversample_factor=100):
     '''
     M = oversample_factor
     if severity == 'none':
-        channel = np.array([1, 0, 0])
+        channel = np.array([1, 0, 0], dtype=float)
     elif severity == 'mild':
-        channel = np.zeros(1+M+1+int(2.3*M)+1)
+        channel = np.zeros(1+M+1+int(2.3*M)+1, dtype=float)
         channel[0] = 1
         channel[M+1] = 0.28
         channel[-1] = 0.11
     elif severity == 'harsh':
-        channel = np.zeros(1+M+1+int(1.8*M)+1)
+        channel = np.zeros(1+M+1+int(1.8*M)+1, dtype=float)
         channel[0] = 1
         channel[M+1] = 0.28
         channel[-1] = 0.4

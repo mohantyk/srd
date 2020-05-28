@@ -7,7 +7,7 @@ import numpy as np
 from scipy import signal
 import warnings
 
-def sine_wave(freq, duration=0.05, Ts=1/10000):
+def sine_wave(freq, duration=0.05, Ts=1/10000, phase=0):
     '''
     inputs:
         freq (Hz)
@@ -17,11 +17,11 @@ def sine_wave(freq, duration=0.05, Ts=1/10000):
         timestep, sine waveform
     '''
     t = np.arange(0, duration, Ts)
-    w = np.sin(2*np.pi*freq*t)
+    w = np.sin(2*np.pi*freq*t + phase)
     return t, w
 
 
-def cosine_wave(freq, duration=0.05, Ts=1/10000):
+def cosine_wave(freq, duration=0.05, Ts=1/10000, phase=0):
     '''
     inputs:
         freq (Hz)
@@ -31,7 +31,7 @@ def cosine_wave(freq, duration=0.05, Ts=1/10000):
         timestep, sine waveform
     '''
     t = np.arange(0, duration, Ts)
-    w = np.cos(2*np.pi*freq*t)
+    w = np.cos(2*np.pi*freq*t + phase)
     return t, w
 
 
