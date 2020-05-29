@@ -9,13 +9,15 @@ Created on Mon Jan  6 13:03:05 2020
 import numpy as np
 from scipy import signal
 
+def db(arr):
+    return 20*np.log10(np.abs(arr))
 
 def power(x):
     '''
     Calculate power of signal x
     '''
     fro = np.linalg.norm(x) # frobenius norm
-    return (fro**2)/len(x) 
+    return (fro**2)/len(x)
 
 
 def detect_env(x):
@@ -27,6 +29,6 @@ def detect_env(x):
     damps = [1, 1, 0, 0]
     b = signal.firls(99, fbe, damps)
     gd = 49 # Can be computed using signal.group_delay
-    
+
     envx = (np.pi/2)*signal.lfilter(b, 1, np.abs(x))
     return envx, gd
