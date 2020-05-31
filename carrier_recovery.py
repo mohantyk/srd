@@ -117,3 +117,50 @@ def costas(sig, freq_estimate, Ts, mu=0.003, initial_phase=0):
         # Update theta
         theta[k+1] = theta[k] - mu*np.dot(lpf, buffer_cosine)*np.dot(lpf, buffer_sine)
     return theta
+
+
+def dual_plls(sig, freq_estimate, Ts, mu1=0.01, mu2=0.003):
+    '''
+    inputs:
+        sig: signal at double the carrier frequency (and double the phase of carrier)
+        freq_estimate: estimate of carrier frequency
+        Ts: sampling duration
+        mu1: learning rate for frequency estimating pll
+        mu2: learning rate for phase estimating pll
+    output:
+        (freq_est, phase_est), (theta1, theta2), est_carrier
+        freq_est: carrier frequency estimate
+        phase_est: carrier phase estimate
+        theta1 : frequency estimating pll output (slope gives estimate of frequency difference)
+        theta2 : phase estimating pll output
+        est_carrier: final estimated squared carrier (at 2*f frequency and 2*phi phase)
+    '''
+    f0 = freq_estimate
+    theta1 = np.zeros_like(sig)
+    theta2 = np.zeros_like(sig)
+    est_carrier = np.zeros_like(sig)
+    # Note: skipping pll since the integrator already does a low pass filtering
+    for k, sample in enumerate(sig[:-1]):
+        tick = k*Ts
+        # Top PLL
+        error1 = np.sin(4*np.pi*f0*tick + 2*theta1[k])*sample
+        theta1[k+1] = theta1[k] - mu1*error1
+        # Bottom PLL
+        error2 =  np.sin(4*np.pi*f0*tick + 2*theta1[k] + 2*theta2[k])*sample
+        theta2[k+1] = theta2[k] - mu2*error2
+        # Estimate carrier
+        est_carrier[k] = np.cos(4*np.pi*f0*tick + 2*theta1[k] + 2*theta2[k])
+    # Add the final sample of the estimated carrier
+    k = len(sig) - 1
+    est_carrier[k] = np.cos(4*np.pi*f0*k*Ts + 2*theta1[k] + 2*theta2[k])
+
+    # Estimate frequency as slope of theta1
+    t = np.arange(0, len(sig)*Ts, Ts)
+    l = len(theta1)
+    f_diff = (theta1[l//2] - theta1[l//4])/(2*np.pi*(t[l//2] - t[l//4]))
+    freq_est = f0 + f_diff
+    # Estimate phase from theta1 and theta2
+    b = theta1[l//2] - 2*np.pi*f_diff # Intercept of theta1 line
+    phase_est = theta2[-1] + b
+
+    return (freq_est, phase_est), (theta1, theta2), est_carrier
