@@ -25,13 +25,13 @@ def letters2pam(msg):
     symbols = [symbol_map[''.join(pair)] for pair in pairwise(msg_bin)]
     return symbols
 
-def pulse_shaped(symbols, oversample_factor=10):
+def pulse_shaped(symbols, oversample_factor=10, shape=signal.hamming):
     '''
     inputs:
         symbols: list of symbols
         oversample_factor: oversampling factor (to simulate analog signal)
     '''
-    pulse = signal.hamming(oversample_factor)
+    pulse = shape(oversample_factor)
     oversampled_symbols = oversample(symbols, oversample_factor)
     analog_signal = np.convolve(oversampled_symbols, pulse)
     analog_signal = analog_signal[:len(oversampled_symbols)] # Remove the trailing transit
