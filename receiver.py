@@ -55,13 +55,14 @@ def demodulate(sig, fc, Ts, taps=50):
     return baseband
 
 
-def pulse_correlator(sig, M):
+def pulse_correlator(sig, M, shape=signal.hamming):
     '''
     inputs:
         sig: baseband signal
         M : oversampling factor
+        shape: pulse shape function, should take a single parameter oversample_factor
     '''
-    pulse = signal.hamming(M)
+    pulse = shape(M)
     # Normalize pulse so that correlation with another pulse gives coeff = 1
     pulse_normalized = pulse/(power(pulse)*len(pulse))
     # In 'full' mode, correlation of a pulse with itself gives an array of 2*M-1 elements
