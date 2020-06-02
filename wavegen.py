@@ -4,6 +4,7 @@ Spyder Editor
 """
 
 import numpy as np
+from numpy import pi
 from scipy import signal
 import warnings
 
@@ -116,4 +117,32 @@ def rcosine(syms, osr, β):
     #delay = duration[1]*osr # Delay of impulse peak in samples
     return rcos_filt
 
+
+def srrc(syms, osr, β, timing_offset=0):
+    '''
+    Square root raised cosine waveform
+    inputs:
+        syms: half the duration
+        osr: oversampling rate
+        β: roll off factor, 0 gives sinc
+        timing_offset: timing offset
+    '''
+    duration = (-syms, syms)
+    N = osr*(duration[1] - duration[0]) + 1
+    t = np.linspace(-syms+timing_offset, syms+timing_offset, N)
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore') # For Divide by zero
+        srrc_wave = ( (np.sin((1-β)*np.pi*t) + (4*β*t)*np.cos((1+β)*np.pi*t)) /
+                        ((np.pi*t)*(1-(4*β*t)**2)) )
+
+    try:
+        zero_idx = np.where(t==0)[0][0]
+        srrc_wave[zero_idx] = (1-β+4*β/pi)
+    except IndexError:
+        pass
+
+    if β != 0:
+        srrc_wave[np.isnan(srrc_wave)] = (  β*(pi+2)/(pi*np.sqrt(2))*np.sin(pi/(4*β)) +
+                                            β*(pi-2)/(pi*np.sqrt(2))*np.cos(pi/(4*β)) )
+    return srrc_wave
 
