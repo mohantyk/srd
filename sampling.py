@@ -42,8 +42,8 @@ def interpolate(samples, t, l, β=0):
     τ = t - t_now
     waveform = srrc(l, 1, β, τ)
 
-    lmargin = max(0, t_now-l)
-    rmargin = min(len(samples), t_now+l+1)
+    lmargin = int(max(0, t_now-l))
+    rmargin = int(min(len(samples), t_now+l+1))
     x = np.convolve(samples[lmargin:rmargin], waveform, 'same')
     final = x[l]
     return final
