@@ -95,30 +95,30 @@ def bandlimited(F_start, F_stop, duration, Ts=1/10000):
     return filtered_noise
 
 
-def rcosine(syms, osr, β):
+def rcosine(syms, osr, β, T=1):
     '''
     Raised cosine waveform
     inputs:
         syms: half the duration
         osr: oversampling rate
         β: roll off factor, 0 gives sinc
+        Ts: symbol period
     '''
-    # All calculations are normalized by T
-    duration = (-syms, syms)
+    duration = (-syms*T, syms*T)
     N = osr*(duration[1] - duration[0]) + 1
     t = np.linspace(*duration, N)
     with warnings.catch_warnings():
         warnings.simplefilter('ignore') # For Divide by zero
-        rcos_filt = np.sinc(t) * np.cos(np.pi*β*t) / (1-(2*β*t)**2)
+        rcos_filt = (1/T)*np.sinc(t/T) * np.cos(pi*β*t/T) / (1-(2*β*t/T)**2)
 
     if β != 0:
-        rcos_filt[np.isinf(rcos_filt)] = (np.pi/4)*np.sinc(1/(2*β))
+        rcos_filt[np.isinf(rcos_filt)] = (pi/(4*T))*np.sinc(1/(2*β))
 
     #delay = duration[1]*osr # Delay of impulse peak in samples
     return rcos_filt
 
 
-def srrc(syms, osr, β, timing_offset=0):
+def srrc(syms, osr, β, timing_offset=0, T=1):
     '''
     Square root raised cosine waveform
     inputs:
@@ -126,23 +126,25 @@ def srrc(syms, osr, β, timing_offset=0):
         osr: oversampling rate
         β: roll off factor, 0 gives sinc
         timing_offset: timing offset
+        T: symbol period
     '''
-    duration = (-syms, syms)
+    # https://en.wikipedia.org/wiki/Root-raised-cosine_filter
+    duration = (-syms*T, syms*T)
     N = osr*(duration[1] - duration[0]) + 1
     t = np.linspace(-syms+timing_offset, syms+timing_offset, N)
     with warnings.catch_warnings():
         warnings.simplefilter('ignore') # For Divide by zero
-        srrc_wave = ( (np.sin((1-β)*np.pi*t) + (4*β*t)*np.cos((1+β)*np.pi*t)) /
-                        ((np.pi*t)*(1-(4*β*t)**2)) )
+        srrc_wave = ( (np.sin((1-β)*pi*t/T) + (4*β*t/T)*np.cos((1+β)*pi*t/T)) /
+                        ((pi*t/T)*(1-(4*β*t/T)**2)) )/T
 
     try:
         zero_idx = np.where(t==0)[0][0]
-        srrc_wave[zero_idx] = (1-β+4*β/pi)
+        srrc_wave[zero_idx] = (1-β+4*β/pi)/T
     except IndexError:
         pass
 
     if β != 0:
-        srrc_wave[np.isnan(srrc_wave)] = (  β*(pi+2)/(pi*np.sqrt(2))*np.sin(pi/(4*β)) +
-                                            β*(pi-2)/(pi*np.sqrt(2))*np.cos(pi/(4*β)) )
+        srrc_wave[np.isnan(srrc_wave)] = β/(np.sqrt(2)*pi*T)*(
+                                    (pi+2)/np.sin(pi/(4*β)) + (pi-2)*np.cos(pi/(4*β)) )
     return srrc_wave
 
