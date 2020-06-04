@@ -8,6 +8,8 @@ from numpy import pi
 from scipy import signal
 import warnings
 
+from utilities import power
+
 def sine_wave(freq, duration=0.05, Ts=1/10000, phase=0):
     '''
     inputs:
@@ -146,5 +148,10 @@ def srrc(syms, osr, β, timing_offset=0, T=1):
     if β != 0:
         srrc_wave[np.isnan(srrc_wave)] = β/(np.sqrt(2)*pi*T)*(
                                     (pi+2)/np.sin(pi/(4*β)) + (pi-2)*np.cos(pi/(4*β)) )
-    return srrc_wave
+
+    # Normalize the srrc by its energy
+    # This enables us to get the raised cosine directly by doing
+    # np.convolve(srrc, srrc, 'same')
+    normalized_srrc = srrc_wave / np.sqrt(len(srrc_wave)*power(srrc_wave))
+    return normalized_srrc
 
