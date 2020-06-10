@@ -3,6 +3,26 @@ from scipy import signal
 
 from receiver import quantalph
 
+def lms_equalizer(received, pilot, taps=4, mu=0.01):
+    '''
+    LMS equalizer
+    parameters:
+        received: received signal
+        pilot: transmitted pilot symbols
+        taps: number of filter taps
+        mu: learning rate
+    output:
+        filter coefficients
+    '''
+    f = np.zeros(taps, float)
+    delay = taps//2
+    for i in range(taps, len(received)):
+        window = received[i:i-taps:-1]
+        predicted = np.dot(f, window)
+        err = pilot[i-delay] - predicted
+        f = f + mu*err*window
+    return f
+
 
 def dd_equalizer(received, alphabet, taps=4, mu=0.1):
     '''
