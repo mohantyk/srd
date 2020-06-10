@@ -3,6 +3,29 @@ from scipy import signal
 
 from receiver import quantalph
 
+
+def dd_equalizer(received, alphabet, taps=4, mu=0.1):
+    '''
+    Decision directed equalizer
+    parameters:
+        received: received signal
+        alphabet: decision alphabet
+        taps: number of filter taps
+        mu: learning rate
+    output:
+        filter coefficients
+    '''
+    f = np.zeros(taps, float)
+    f[len(f)//2] = 1 # Center-spike initialization
+    for i in range(taps, len(received)):
+        window = received[i:i-taps:-1]
+        predicted = np.dot(f, window)
+        decision = quantalph(np.array(predicted), alphabet)
+        err = decision[0] - predicted
+        f = f + mu*err*window
+    return f
+
+
 def evaluate_equalizer(channel, equalizer, alphabet=None, num_symbols=1000):
     '''
     Evaluates the quality of a equalizer by simulation with random samples
